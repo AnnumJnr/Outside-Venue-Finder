@@ -7,72 +7,91 @@ let markerCluster = null;
  * Initialize Leaflet map
  */
 function initializeMap() {
-    // Check if map container exists
     const mapContainer = document.getElementById('map');
     if (!mapContainer) {
         console.error('Map container not found!');
         return;
     }
 
-    // Remove existing map if any
+    // Remove existing map instance if re-initializing
     if (map) {
         map.remove();
     }
 
     // Create map centered on Accra
-    map = L.map('map').setView(MAP_CONFIG.defaultCenter, MAP_CONFIG.defaultZoom);
+    map = L.map('map', {
+        zoomControl: true,
+        preferCanvas: true,
+        attributionControl: true,
+    }).setView(MAP_CONFIG.defaultCenter, MAP_CONFIG.defaultZoom);
 
-    // Add OpenStreetMap tiles
-    L.tileLayer(MAP_CONFIG.tileLayer, {
+    // Add OpenStreetMap tiles with fallback & error handling
+    const tileLayer = L.tileLayer(MAP_CONFIG.tileLayer, {
         maxZoom: MAP_CONFIG.maxZoom,
-        attribution: MAP_CONFIG.attribution
-    }).addTo(map);
+        attribution: MAP_CONFIG.attribution,
+        detectRetina: true,
+        crossOrigin: true
+    });
 
-    console.log('✅ Map initialized');
+    // Retry tiles that fail to load
+    tileLayer.on('tileerror', function(e) {
+        console.warn('Tile load error:', e.coords);
+        setTimeout(() => e.tile.src = e.tile.src, 1000); // retry once
+    });
+
+    tileLayer.addTo(map);
+
+    // Fix map rendering after it fully loads
+    map.whenReady(() => {
+        setTimeout(() => {
+            map.invalidateSize();
+            console.log('✅ Map fully initialized and validated');
+        }, 300);
+    });
 }
 
 /**
- * Clear all markers from map
+ * Fix map display issues (gray tiles)
+ */
+function fixMapDisplay() {
+    if (!map) return;
+
+    // Use requestAnimationFrame for smoother invalidation
+    requestAnimationFrame(() => {
+        map.invalidateSize({ animate: true });
+        console.log('✅ Map display fixed');
+    });
+}
+
+/**
+ * Clear all markers
  */
 function clearMarkers() {
-    markers.forEach(marker => {
-        map.removeLayer(marker);
-    });
+    markers.forEach(marker => map.removeLayer(marker));
     markers = [];
 }
 
 /**
  * Add markers for venues
- * @param {Array} venues - Array of venue objects
  */
 function addVenueMarkers(venues) {
     clearMarkers();
-
     if (!venues || venues.length === 0) {
         console.log('No venues to display');
         return;
     }
-
-    console.log(`Adding ${venues.length} markers to map`);
 
     const bounds = [];
 
     venues.forEach(venue => {
         const lat = parseFloat(venue.latitude);
         const lng = parseFloat(venue.longitude);
-
-        // Validate coordinates
         if (isNaN(lat) || isNaN(lng)) {
             console.warn(`Invalid coordinates for ${venue.name}`);
             return;
         }
 
-        // Create marker
-        const marker = L.marker([lat, lng], {
-            title: venue.name
-        });
-
-        // Create popup content
+        const marker = L.marker([lat, lng], { title: venue.name });
         const popupContent = `
             <div class="venue-popup">
                 <h3 style="margin: 0 0 8px 0; font-size: 1.1rem;">${venue.name}</h3>
@@ -85,51 +104,39 @@ function addVenueMarkers(venues) {
                 <p style="margin: 4px 0; font-size: 0.85rem;">
                     💰 ${venue.price_range} • ⭐ ${venue.rating || 'N/A'}
                 </p>
-                <button 
-                    onclick="showVenueDetails(${venue.id})" 
-                    style="margin-top: 8px; padding: 6px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 0.85rem;">
+                <button onclick="showVenueDetails(${venue.id})"
+                    style="margin-top: 8px; padding: 6px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 0.85rem;">
                     View Details
                 </button>
             </div>
         `;
 
         marker.bindPopup(popupContent);
-
-        // Add click event
-        marker.on('click', function() {
-            // Highlight corresponding venue card
-            highlightVenueCard(venue.id);
-        });
-
-        // Add to map and array
+        marker.on('click', () => highlightVenueCard(venue.id));
         marker.addTo(map);
+
         markers.push(marker);
         bounds.push([lat, lng]);
     });
 
-    // Fit map to show all markers
     if (bounds.length > 0) {
-        map.fitBounds(bounds, {
-            padding: [50, 50],
-            maxZoom: 14
-        });
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
     }
 
-    console.log(`✅ Added ${markers.length} markers`);
+    // Fix map display once markers added
+    setTimeout(fixMapDisplay, 400);
 }
 
 /**
- * Highlight a venue card in the list
- * @param {number} venueId - Venue ID
+ * Highlight venue card
  */
 function highlightVenueCard(venueId) {
-    // Remove previous highlights
     document.querySelectorAll('.venue-card').forEach(card => {
         card.style.borderColor = 'rgba(255, 255, 255, 0.2)';
         card.style.background = 'rgba(255, 255, 255, 0.1)';
     });
 
-    // Highlight selected card
     const card = document.querySelector(`[data-venue-id="${venueId}"]`);
     if (card) {
         card.style.borderColor = '#667eea';
@@ -139,36 +146,34 @@ function highlightVenueCard(venueId) {
 }
 
 /**
- * Focus map on specific venue
- * @param {number} lat - Latitude
- * @param {number} lng - Longitude
+ * Focus map on a venue
  */
 function focusOnVenue(lat, lng) {
-    if (map) {
-        map.setView([lat, lng], 16, {
-            animate: true,
-            duration: 1
-        });
+    if (!map) return;
 
-        // Find and open popup for this location
-        markers.forEach(marker => {
-            const markerLatLng = marker.getLatLng();
-            if (Math.abs(markerLatLng.lat - lat) < 0.0001 && 
-                Math.abs(markerLatLng.lng - lng) < 0.0001) {
-                marker.openPopup();
-            }
-        });
-    }
+    map.setView([lat, lng], 16, { animate: true, duration: 1 });
+
+    markers.forEach(marker => {
+        const pos = marker.getLatLng();
+        if (Math.abs(pos.lat - lat) < 0.0001 && Math.abs(pos.lng - lng) < 0.0001) {
+            marker.openPopup();
+        }
+    });
 }
 
-// Initialize map when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, checking for map container...');
-    
-    // Only initialize if map container exists
+// Initialize map when DOM ready
+document.addEventListener('DOMContentLoaded', () => {
     const mapContainer = document.getElementById('map');
     if (mapContainer) {
-        // Small delay to ensure proper rendering
-        setTimeout(initializeMap, 100);
+        setTimeout(() => {
+            initializeMap();
+            fixMapDisplay();
+        }, 300);
     }
+});
+
+// Handle window resize or tab switch
+window.addEventListener('resize', fixMapDisplay);
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') fixMapDisplay();
 });

@@ -162,6 +162,9 @@ function displaySearchResults(venues, location) {
         `;
         resultsSection.style.display = 'block';
         resultsSection.scrollIntoView({ behavior: 'smooth' });
+        
+        // Fix map display even when no results
+        fixMapDisplay();
         return;
     }
 
@@ -171,11 +174,13 @@ function displaySearchResults(venues, location) {
         venueList.appendChild(card);
     });
 
-    // Add markers to map
-    addVenueMarkers(venues);
-
-    // Show results section
+    // Show results section FIRST
     resultsSection.style.display = 'block';
+    
+    // Then add markers (this will also fix the map)
+    addVenueMarkers(venues);
+    
+    // Scroll to results
     resultsSection.scrollIntoView({ behavior: 'smooth' });
 
     hideLoadingState();
