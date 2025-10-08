@@ -1,0 +1,286 @@
+from django.core.management.base import BaseCommand
+from venues.models import Category, Venue, VenueImage, Amenity, VenueAmenity
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+class Command(BaseCommand):
+    help = 'Populate database with sample venue data for testing'
+
+    def handle(self, *args, **kwargs):
+        self.stdout.write(self.style.SUCCESS('Starting data population...'))
+        
+        # Clear existing data (optional - comment out if you want to keep existing data)
+        self.stdout.write('Clearing existing data...')
+        VenueAmenity.objects.all().delete()
+        VenueImage.objects.all().delete()
+        Venue.objects.all().delete()
+        Amenity.objects.all().delete()
+        Category.objects.all().delete()
+        
+        # Create Categories
+        self.stdout.write('Creating categories...')
+        categories_data = [
+            {'name': 'Restaurants', 'slug': 'restaurant', 'icon': '🍽️', 'description': 'Great places to eat'},
+            {'name': 'Cafes', 'slug': 'cafe', 'icon': '☕', 'description': 'Coffee and snacks'},
+            {'name': 'Entertainment', 'slug': 'entertainment', 'icon': '🎪', 'description': 'Fun and games'},
+            {'name': 'Lounges', 'slug': 'lounge', 'icon': '🛋️', 'description': 'Relaxation spots'},
+            {'name': 'Cinemas', 'slug': 'cinema', 'icon': '🎬', 'description': 'Movie theaters'},
+            {'name': 'Bars', 'slug': 'bar', 'icon': '🍺', 'description': 'Drinks and nightlife'},
+        ]
+        
+        categories = {}
+        for cat_data in categories_data:
+            cat = Category.objects.create(**cat_data)
+            categories[cat.slug] = cat
+            self.stdout.write(f'  ✓ Created category: {cat.name}')
+        
+        # Create Amenities
+        self.stdout.write('\nCreating amenities...')
+        amenities_data = [
+            {'name': 'WiFi', 'icon': '📶'},
+            {'name': 'Parking', 'icon': '🅿️'},
+            {'name': 'Outdoor Seating', 'icon': '🌳'},
+            {'name': 'Air Conditioning', 'icon': '❄️'},
+            {'name': 'Card Payment', 'icon': '💳'},
+            {'name': 'Wheelchair Accessible', 'icon': '♿'},
+            {'name': 'Live Music', 'icon': '🎵'},
+            {'name': 'Delivery Available', 'icon': '🚚'},
+            {'name': 'Pet Friendly', 'icon': '🐕'},
+            {'name': 'Private Rooms', 'icon': '🚪'},
+        ]
+        
+        amenities = {}
+        for am_data in amenities_data:
+            am = Amenity.objects.create(**am_data)
+            amenities[am.name] = am
+            self.stdout.write(f'  ✓ Created amenity: {am.name}')
+        
+        # Create Venues
+        self.stdout.write('\nCreating venues...')
+        venues_data = [
+            # KUMASI - RESTAURANTS
+            {
+                'name': 'Santasi Grill House',
+                'category': categories['restaurant'],
+                'description': 'Authentic Ghanaian cuisine with a modern twist. Known for our grilled tilapia and jollof rice.',
+                'city': 'Kumasi',
+                'area': 'Ahodwo',
+                'address': '123 Main Street, Ahodwo, Kumasi',
+                'latitude': 6.6885,
+                'longitude': -1.6244,
+                'price_range': '$$',
+                'rating': 4.5,
+                'phone_number': '+233 24 123 4567',
+                'website': 'https://santasigrill.com',
+                'amenities': ['WiFi', 'Parking', 'Air Conditioning', 'Card Payment', 'Outdoor Seating']
+            },
+            {
+                'name': 'Royal Kitchen',
+                'category': categories['restaurant'],
+                'description': 'Fine dining experience with international and local cuisine. Perfect for special occasions.',
+                'city': 'Kumasi',
+                'area': 'Asokwa',
+                'address': '45 Royal Avenue, Asokwa, Kumasi',
+                'latitude': 6.6850,
+                'longitude': -1.6200,
+                'price_range': '$$$',
+                'rating': 4.8,
+                'phone_number': '+233 24 234 5678',
+                'website': 'https://royalkitchen.gh',
+                'amenities': ['WiFi', 'Parking', 'Air Conditioning', 'Card Payment', 'Private Rooms', 'Wheelchair Accessible']
+            },
+            {
+                'name': 'Garden Bistro',
+                'category': categories['restaurant'],
+                'description': 'Casual dining with a beautiful garden setting. Great for families and friends.',
+                'city': 'Kumasi',
+                'area': 'Bantama',
+                'address': '78 Garden Road, Bantama, Kumasi',
+                'latitude': 6.6920,
+                'longitude': -1.6280,
+                'price_range': '$$',
+                'rating': 4.3,
+                'phone_number': '+233 24 345 6789',
+                'amenities': ['WiFi', 'Parking', 'Outdoor Seating', 'Pet Friendly', 'Card Payment']
+            },
+            
+            # KUMASI - CAFES
+            {
+                'name': 'Brew & Bites Cafe',
+                'category': categories['cafe'],
+                'description': 'Cozy cafe with premium coffee and pastries. Perfect workspace for freelancers.',
+                'city': 'Kumasi',
+                'area': 'Ahodwo',
+                'address': '56 Coffee Lane, Ahodwo, Kumasi',
+                'latitude': 6.6890,
+                'longitude': -1.6250,
+                'price_range': '$',
+                'rating': 4.6,
+                'phone_number': '+233 24 456 7890',
+                'amenities': ['WiFi', 'Air Conditioning', 'Card Payment', 'Outdoor Seating']
+            },
+            {
+                'name': 'The Daily Grind',
+                'category': categories['cafe'],
+                'description': 'Popular spot for students and young professionals. Great coffee and snacks.',
+                'city': 'Kumasi',
+                'area': 'Ayeduase',
+                'address': '12 University Road, Ayeduase, Kumasi',
+                'latitude': 6.6750,
+                'longitude': -1.5720,
+                'price_range': '$',
+                'rating': 4.4,
+                'phone_number': '+233 24 567 8901',
+                'amenities': ['WiFi', 'Card Payment', 'Delivery Available']
+            },
+            
+            # KUMASI - BARS
+            {
+                'name': 'Skyline Lounge Bar',
+                'category': categories['bar'],
+                'description': 'Rooftop bar with stunning city views. Live DJ on weekends.',
+                'city': 'Kumasi',
+                'area': 'Ahodwo',
+                'address': '89 Heights Boulevard, Ahodwo, Kumasi',
+                'latitude': 6.6875,
+                'longitude': -1.6235,
+                'price_range': '$$$',
+                'rating': 4.7,
+                'phone_number': '+233 24 678 9012',
+                'amenities': ['WiFi', 'Parking', 'Air Conditioning', 'Card Payment', 'Live Music']
+            },
+            
+            # ACCRA - RESTAURANTS
+            {
+                'name': 'Osu Buka',
+                'category': categories['restaurant'],
+                'description': 'Traditional Ghanaian restaurant in the heart of Osu. Famous for banku and okra.',
+                'city': 'Accra',
+                'area': 'Osu',
+                'address': '23 Oxford Street, Osu, Accra',
+                'latitude': 5.5558,
+                'longitude': -0.1826,
+                'price_range': '$$',
+                'rating': 4.5,
+                'phone_number': '+233 30 276 3456',
+                'amenities': ['WiFi', 'Air Conditioning', 'Card Payment', 'Delivery Available']
+            },
+            {
+                'name': 'Labadi Seafood Grill',
+                'category': categories['restaurant'],
+                'description': 'Fresh seafood right by the beach. Amazing sunset views.',
+                'city': 'Accra',
+                'area': 'Labadi',
+                'address': '45 Beach Road, Labadi, Accra',
+                'latitude': 5.5919,
+                'longitude': -0.1559,
+                'price_range': '$$$',
+                'rating': 4.8,
+                'phone_number': '+233 30 287 4567',
+                'amenities': ['Parking', 'Outdoor Seating', 'Card Payment', 'Live Music', 'Wheelchair Accessible']
+            },
+            
+            # ACCRA - CAFES
+            {
+                'name': 'Coffee Junction',
+                'category': categories['cafe'],
+                'description': 'Modern cafe chain with multiple locations. Consistent quality and service.',
+                'city': 'Accra',
+                'area': 'East Legon',
+                'address': '12 Jungle Avenue, East Legon, Accra',
+                'latitude': 5.6388,
+                'longitude': -0.1513,
+                'price_range': '$$',
+                'rating': 4.4,
+                'phone_number': '+233 30 298 5678',
+                'amenities': ['WiFi', 'Air Conditioning', 'Card Payment', 'Parking', 'Wheelchair Accessible']
+            },
+            
+            # ACCRA - ENTERTAINMENT
+            {
+                'name': 'Game Zone Entertainment',
+                'category': categories['entertainment'],
+                'description': 'Arcade games, bowling, and virtual reality experiences for all ages.',
+                'city': 'Accra',
+                'area': 'Spintex',
+                'address': '78 Spintex Road, Accra',
+                'latitude': 5.6319,
+                'longitude': -0.1069,
+                'price_range': '$$',
+                'rating': 4.6,
+                'phone_number': '+233 30 309 6789',
+                'amenities': ['Parking', 'Air Conditioning', 'Card Payment', 'Wheelchair Accessible']
+            },
+            
+            # ACCRA - CINEMAS
+            {
+                'name': 'Silverbird Cinemas Accra',
+                'category': categories['cinema'],
+                'description': 'Premium cinema experience with comfortable seating and latest movies.',
+                'city': 'Accra',
+                'area': 'Accra Mall',
+                'address': 'Accra Mall, Tetteh Quarshie, Accra',
+                'latitude': 5.6458,
+                'longitude': -0.1719,
+                'price_range': '$$',
+                'rating': 4.7,
+                'phone_number': '+233 30 276 7890',
+                'amenities': ['Parking', 'Air Conditioning', 'Card Payment', 'Wheelchair Accessible']
+            },
+            
+            # TAKORADI - RESTAURANTS
+            {
+                'name': 'Takoradi Beach Restaurant',
+                'category': categories['restaurant'],
+                'description': 'Beachfront dining with fresh seafood and continental dishes.',
+                'city': 'Takoradi',
+                'area': 'Beach Road',
+                'address': '15 Beach Road, Takoradi',
+                'latitude': 4.8985,
+                'longitude': -1.7531,
+                'price_range': '$$',
+                'rating': 4.4,
+                'phone_number': '+233 31 202 3456',
+                'amenities': ['Parking', 'Outdoor Seating', 'Card Payment', 'Live Music']
+            },
+            
+            # TAKORADI - LOUNGES
+            {
+                'name': 'Harbor View Lounge',
+                'category': categories['lounge'],
+                'description': 'Upscale lounge with harbor views. Perfect for evening relaxation.',
+                'city': 'Takoradi',
+                'area': 'Harbor Area',
+                'address': '23 Harbor Street, Takoradi',
+                'latitude': 4.9019,
+                'longitude': -1.7584,
+                'price_range': '$$$',
+                'rating': 4.5,
+                'phone_number': '+233 31 213 4567',
+                'amenities': ['WiFi', 'Air Conditioning', 'Card Payment', 'Private Rooms', 'Live Music']
+            },
+        ]
+        
+        for venue_data in venues_data:
+            # Extract amenities list
+            amenities_list = venue_data.pop('amenities', [])
+            
+            # Create venue
+            venue = Venue.objects.create(**venue_data)
+            
+            # Add amenities
+            for amenity_name in amenities_list:
+                if amenity_name in amenities:
+                    VenueAmenity.objects.create(venue=venue, amenity=amenities[amenity_name])
+            
+            self.stdout.write(f'  ✓ Created venue: {venue.name} in {venue.city}')
+        
+        # Summary
+        self.stdout.write('\n' + '='*50)
+        self.stdout.write(self.style.SUCCESS('Data population completed successfully!'))
+        self.stdout.write(f'  Categories: {Category.objects.count()}')
+        self.stdout.write(f'  Amenities: {Amenity.objects.count()}')
+        self.stdout.write(f'  Venues: {Venue.objects.count()}')
+        self.stdout.write('='*50)

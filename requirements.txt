@@ -1,0 +1,10 @@
+django
+django-filter
+djangorestframework
+requests
+pyyaml
+django-cors-headers
+python-decouple
+Pillow
+overpy
+requests
