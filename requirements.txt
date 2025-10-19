@@ -10,4 +10,5 @@ overpy
 requests
 coverage
  flake8
-  black
+ black
+dotenv
