@@ -8,3 +8,6 @@ python-decouple
 Pillow
 overpy
 requests
+coverage
+ flake8
+  black

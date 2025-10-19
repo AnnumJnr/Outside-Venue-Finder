@@ -1,0 +1,82 @@
+name: Django CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: [3.13]
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v3
+    
+    - name: 🐍 Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    
+    - name: 📦 Cache pip packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: ⚙️ Setup CI environment
+      run: |
+        chmod +x scripts/setup_ci.sh
+        ./scripts/setup_ci.sh
+    
+    - name: 🏗️ Build project
+      run: |
+        chmod +x scripts/build.sh
+        ./scripts/build.sh
+    
+    - name: 🧪 Run tests
+      run: |
+        chmod +x scripts/test.sh
+        ./scripts/test.sh
+    
+    - name: 📊 Upload coverage report
+      uses: codecov/codecov-action@v3
+      if: matrix.python-version == '3.11'
+      with:
+        files: ./coverage.xml
+        fail_ci_if_error: false
+    
+    - name: 🔍 Lint with flake8
+      run: |
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
+    - name: ✅ All checks passed
+      run: echo "🎉 All tests and checks passed successfully!"
+
+  deploy-ready:
+    name: Deployment Ready Check
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v3
+    
+    - name: ✅ Ready for deployment
+      run: |
+        echo "🚀 All tests passed - Ready for deployment!"
+        echo "Branch: ${{ github.ref }}"
+        echo "Commit: ${{ github.sha }}"
