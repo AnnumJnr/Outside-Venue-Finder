@@ -1,0 +1,49 @@
+name: Outside CI
+
+on:
+  push:
+    branches: [ main ]  # Runs only when you push to main
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    env:
+      DEBUG: False
+      SECRET_KEY: test-secret-key
+      DJANGO_SETTINGS_MODULE: Outside.settings
+
+    steps:
+      - name: 🛎️ Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+
+      - name: 📦 Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: ⚙️ Run migrations
+        run: |
+          source venv/bin/activate
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
+
+      - name: 🧪 Run tests
+        run: |
+          source venv/bin/activate
+          python manage.py test
+
+      - name: ✅ Verify build success
+        if: success()
+        run: echo "✅ Django app built and tested successfully!"
+
+
