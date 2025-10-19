@@ -2,21 +2,16 @@ name: Outside CI
 
 on:
   push:
-    branches: [ main ]  # Runs only when you push to main
+    branches: [ "main" ]  # or your branch name
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    env:
-      DEBUG: False
-      SECRET_KEY: test-secret-key
-      DJANGO_SETTINGS_MODULE: Outside.settings
-
     steps:
-      - name: 🛎️ Checkout code
+      - name: 🧩 Checkout repository
         uses: actions/checkout@v4
 
       - name: 🐍 Set up Python
@@ -32,18 +27,22 @@ jobs:
           pip install -r requirements.txt
 
       - name: ⚙️ Run migrations
+        working-directory: Outside  # 👈 run from the folder where manage.py is
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings  # 👈 point to the config folder
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
-          source venv/bin/activate
+          source ../venv/bin/activate
           python manage.py makemigrations --noinput
           python manage.py migrate --noinput
 
       - name: 🧪 Run tests
+        working-directory: Outside
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings
         run: |
-          source venv/bin/activate
+          source ../venv/bin/activate
           python manage.py test
 
-      - name: ✅ Verify build success
-        if: success()
-        run: echo "✅ Django app built and tested successfully!"
 
 
