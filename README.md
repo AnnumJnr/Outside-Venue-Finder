@@ -1,9 +1,9 @@
 # Outside Venue Finder
 
 A Django web application built with Django REST Framework for discovering venues. This project provides a RESTful API backend, and is designed to be easily run on any device with Python and Django installed.
-The app is not completed yet and so the search function only works for locations in Acccra. So for now, when you select a category, just type Accra and click on search and the various locations should show. Also the map has a bit of an issue which I am currently working on as well as a few features I might add. All changes done will be immediately updated to this repo
+Third party API gave limited data and so the search function only works for locations in Acccra. So for now, when you select a category, just type Accra and click on search and the various locations should show. 
 
-## Features
+## Makeup Features
 
 - Django REST Framework-based API
 - Venue search and filtering
@@ -11,6 +11,16 @@ The app is not completed yet and so the search function only works for locations
 - Image processing and uploads
 - Uses OpenStreetMap data via Overpy
 - Secure environment configuration
+
+  ## App Features
+- Complete authentication system
+- Search with interactive map
+- Venue details with directions
+- Recent searches history
+- About page (professional info about the app)
+- Contact page (with functional form)
+- Beautiful cyber-themed design
+- Fully functional app!
 
 ## Requirements
 
