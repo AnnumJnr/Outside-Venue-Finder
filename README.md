@@ -17,8 +17,8 @@ Third party API gave limited data and so the search function only works for loca
 - Search with interactive map
 - Venue details with directions
 - Recent searches history
-- About page (professional info about the app)
-- Contact page (with functional form)
+- About page 
+- Contact page 
 - Beautiful cyber-themed design
 - Fully functional app!
 
