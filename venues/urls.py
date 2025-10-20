@@ -12,7 +12,13 @@ app_name = 'venues'
 urlpatterns = [
     # Home page
     path('', TemplateView.as_view(template_name='venues/home.html'), name='home'),
-    
+
+    # About page
+    path('about/', TemplateView.as_view(template_name='venues/about.html'), name='about'),
+
+    # Contact page
+    path('contact/', TemplateView.as_view(template_name='venues/contact.html'), name='contact'),    
+
     # API endpoints
     path('api/categories/', CategoryListView.as_view(), name='category-list'),
     path('api/search/', VenueSearchView.as_view(), name='venue-search'),

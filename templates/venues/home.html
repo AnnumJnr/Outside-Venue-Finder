@@ -927,15 +927,15 @@
             </div>
             <div class="nav-links">
                 <input type="text" class="nav-search" placeholder="Search places...">
-                <button class="nav-btn">About</button>
-                <button class="nav-btn">Contact</button>
-
+                <a href="{% url 'venues:about' %}" class="nav-btn" style="text-decoration: none;">About</a>
+                <a href="{% url 'venues:contact' %}" class="nav-btn" style="text-decoration: none;">Contact</a>
+                
                 <!-- User profile (shown when logged in) -->
                 <div class="user-profile" id="user-profile" style="display: none;">
                     <div class="user-avatar" id="user-avatar">U</div>
                     <span id="user-name">User</span>
                 </div>
-
+                
                 <!-- Login button (shown when not logged in) -->
                 <button class="nav-btn" id="login-btn">Login</button>
             </div>

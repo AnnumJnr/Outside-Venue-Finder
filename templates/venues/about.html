@@ -1,0 +1,311 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Outside</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0.9;
+            z-index: -1;
+        }
+
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.05) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 2px, transparent 2px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        nav {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            padding: 15px 30px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+
+        .content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-top: 40px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-grid"></div>
+
+    <div class="container">
+        <!-- Navigation -->
+        <nav>
+            <a href="{% url 'venues:home' %}" class="logo">
+                <span class="logo-icon">🌐</span>
+                <span>Outside</span>
+            </a>
+            <div class="nav-links">
+                <a href="{% url 'venues:home' %}" class="nav-btn">Home</a>
+                <a href="{% url 'venues:about' %}" class="nav-btn">About</a>
+                <a href="{% url 'venues:contact' %}" class="nav-btn">Contact</a>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <div class="content">
+            <h1>About Outside</h1>
+            
+            <p>
+                <strong>Outside</strong> This app is the perfect guide for all sheltered introverts like me that cannot even go to a store outdoor without having
+                someone to go with you and give you directions. It is the best guide for finding places to go and relax with your friends as well as finding hidden outdoor gems that you had no idea was around.
+                Whatever venue it is you trying to find or didn't even know existed, we will find it for you.  
+            </p>
+
+            <h2>🎯 The BIG idea</h2>
+            <p>
+                It is time to get up from your room and go out. See those peeps on snap at some nice location you haven't even heard about outside,
+                let us go there as well. In a new area and don't know any nice cool place to liven up with your peeps, we will help you find there.
+                Outside is all about hot locations right on your devices. So what say you, let's go stretch a bit Outside shall we ?
+
+            </p>
+
+            <h2>✨ Features</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🗺️</div>
+                    <div class="feature-title">Interactive Maps</div>
+                    <div class="feature-desc">
+                        Visualize all venues on an interactive map with precise locations and easy navigation.
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <div class="feature-title">Smart Search</div>
+                    <div class="feature-desc">
+                        Find exactly what you're looking for with our intelligent search and filter system.
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⭐</div>
+                    <div class="feature-title">Ratings & Reviews</div>
+                    <div class="feature-desc">
+                        Discover top-rated venues based on real user experiences and ratings.
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-title">Mobile Friendly</div>
+                    <div class="feature-desc">
+                        Access Outside on any device - desktop, tablet, or mobile phone.
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <div class="feature-title">Personal Account</div>
+                    <div class="feature-desc">
+                        Save your favorite places and keep track of your search history.
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <div class="feature-title">Fast & Reliable</div>
+                    <div class="feature-desc">
+                        Lightning-fast search results with accurate, up-to-date information.
+                    </div>
+                </div>
+            </div>
+
+            <h2>🌟 Why Choose Outside?</h2>
+            <p>
+                <strong>Outside</strong> is designed with you in mind. We understand that finding the right place 
+                at the right time can make or break your experience. That's why we've created a platform that's:
+            </p>
+            
+            <ul style="font-size: 1.1rem; line-height: 2; color: #555; margin-left: 30px;">
+                <li><strong>Easy to Use:</strong> Intuitive interface that anyone can navigate</li>
+                <li><strong>Comprehensive:</strong> Wide range of categories from restaurants to entertainment</li>
+                <li><strong>Accurate:</strong> Real, verified venue information with exact locations</li>
+                <li><strong>Free:</strong> No hidden fees or premium restrictions</li>
+                <li><strong>Community-Driven:</strong> Built for people who love to explore</li>
+            </ul>
+
+            <h2>🚀 Get Started</h2>
+            <p>
+                Ready to discover your next favorite spot? 
+                <a href="{% url 'venues:home' %}" style="color: #667eea; font-weight: 600; text-decoration: none;">
+                    Start exploring now →
+                </a>
+            </p>
+
+            <p style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #e0e0e0; font-size: 0.95rem; color: #999;">
+                <strong>Outside</strong> - Discover amazing places in your city<br>
+                © 2025 Outside. A personal project by Juuju.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
